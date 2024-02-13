@@ -1,4 +1,4 @@
-# StockTracker
+# StockCalculator
 Basic python code that can pull stock information from the internet and use it to calculate how much money you've made
 
 # Note: Please do not use this for any commercial use
