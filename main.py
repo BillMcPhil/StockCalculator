@@ -4,21 +4,26 @@ from tkinter import *
 stocks = []
 num_of_shares = []
 beginning_price = []
+
 window = Tk()
 
-def find_stock(stock):
+label1 = Label(text="Enter a stock")
+stock_entry = Entry()
+stock_button = Button(text="Enter", command=lambda: find_stock(stock_entry.get()))
+
+label1.pack()
+stock_entry.pack()
+stock_button.pack()
+
+def find_stock(stock: str) -> None:
     if yf.Ticker(stock).fast_info.last_price != None:
         stocks.append(stock)
-
     else:
         print("Not a publicly traded stock")
 
-def get_finances():
+def get_finances(number):
     while True:
-        while True:
-            find_stock(input("Please enter a stock "))
-            num = input("How many shares of this stock did you buy? ")
-
+        while True:            
             try:
                 num = int(num)
                 num_of_shares.append(num)
@@ -65,8 +70,21 @@ def calculate_money():
     else:
         print("You lost $" + str((money_has - money_spent) * -1))
 
-if __name__ == '__main__':
-     get_finances()
-     calculate_money()
+def remove_widgets():
+    stock_button.pack_forget()
+    stock_entry.delete(0, END)
+    label1.pack_forget()
+
+def add_widgets(label: str):
+    global label1
+    label1 = Label(text=label)
+    label1.pack()
+
+window.mainloop()
+
+
+#if __name__ == '__main__':
+    #get_finances()
+    #calculate_money()
 
 
