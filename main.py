@@ -9,50 +9,24 @@ window = Tk()
 
 label1 = Label(text="Enter a stock")
 stock_entry = Entry()
-stock_button = Button(text="Enter", command=lambda: find_stock(stock_entry.get()))
+stock_button = Button(text="Enter", command=lambda: add_stock(stock_entry.get()))
 
 label1.pack()
 stock_entry.pack()
 stock_button.pack()
 
-def find_stock(stock: str) -> None:
-    if yf.Ticker(stock).fast_info.last_price != None:
-        stocks.append(stock)
-    else:
+def add_stock(stock: str) -> None:
+    global stock_button
+    try:
+        if yf.Ticker(stock).fast_info.last_price != None:
+            stocks.append(stock)
+            reset_page("How many did you buy?")
+            stock_button = Button(text="Enter", command=lambda: add_shares(stock_entry.get()))
+            stock_button.pack()
+        else:
+            print("Not a publicly traded stock")
+    except:
         print("Not a publicly traded stock")
-
-def get_finances(number):
-    while True:
-        while True:            
-            try:
-                num = int(num)
-                num_of_shares.append(num)
-
-            except:
-                print("Must be a valid integer")
-                print("\n")
-                continue
-
-            break
-
-        while True:
-            price = input("What was the price you bought the shares at? ")
-
-            try:
-                price = float(price)
-                beginning_price.append(price)
-
-            except:
-                print("Must be a valid price")
-                print("\n")
-                continue
-
-            break
-
-        exit = input("Enter 1 to continue or any other key to enter another stock ")
-
-        if exit == "1":
-            break
 
 def calculate_money():
     money_spent = 0
@@ -64,21 +38,56 @@ def calculate_money():
         money_has += num_of_shares[i] * current_price
 
     if money_has > money_spent:
-        print("Congrats! You've gained $" + str(money_has - money_spent))
+        facts_label = Label(text=f"Congrats you made {money_has-money_spent} dollars")
+        facts_label.pack()
     elif money_has == money_spent:
-        print("You've gained 0 dollars")
+        facts_label = Label(text="You've made 0 dollars")
+        facts_label.pack()        
     else:
-        print("You lost $" + str((money_has - money_spent) * -1))
+        facts_label = Label(text=f"You lost $" + str((money_has - money_spent) * -1))
+        facts_label.pack()
+        
+def add_shares(num: str) -> None:
+    try:
+        num = int(num)
+        num_of_shares.append(num)
+        reset_page("What was the buying price?")
+        stock_button = Button(text="Enter", command=lambda: add_prices(stock_entry.get()))
+        stock_button.pack()
+    except:
+        reset_page("How many did you buy?")
+        stock_button = Button(text="Enter", command=lambda: add_shares(stock_entry.get()))
+        stock_button.pack()
+        error_label = Label(text="Must be an integer")
+        error_label.pack()
 
-def remove_widgets():
-    stock_button.pack_forget()
-    stock_entry.delete(0, END)
-    label1.pack_forget()
+def add_prices(num: str) -> None:
+    try:
+        num = float(num)
+        beginning_price.append(num)
+        reset_page("Enter another stock or continue")
+        stock_button = Button(text="Another one", command=lambda: add_stock(stock_entry.get()))
+        stock_button.pack()
+        continue_button = Button(text="Continue", command=calculate_money)
+        continue_button.pack()
+    except:
+        reset_page("What was the buying price?")
+        stock_button = Button(text="Enter", command=lambda: add_prices(stock_entry.get()))
+        stock_button.pack()
+        error_label = Label(text="Must be an integer")
+        error_label.pack()
 
-def add_widgets(label: str):
+def reset_page(label: str):
     global label1
+    global stock_entry
+    
+    for widget in window.winfo_children():
+        widget.destroy()
+    
     label1 = Label(text=label)
     label1.pack()
+    stock_entry = Entry()
+    stock_entry.pack()
 
 window.mainloop()
 
